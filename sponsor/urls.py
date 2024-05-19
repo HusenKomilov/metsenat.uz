@@ -4,11 +4,14 @@ from sponsor import views
 
 router = DefaultRouter()
 
-router.register(r"sponsor", views.SponsorUpdateAPIView, basename="sponsor")
+# router.register(r"sponsor", views.SponsorAPIView, basename="sponsor")
+router.register(r"student", views.StudentAPIView, basename="student")
 
 
 urlpatterns = [
-    path("sponsors/", views.SponsorListAPIView.as_view()),
+    path("sponsor/", views.SponsorLisAPIView.as_view()),
+    path("sponsor/create/", views.SponsorCreateAPIView.as_view()),
+    path("sponsor/<int:pk>/", views.SponsorRetriveUpdateAPIView.as_view()),
+    # path("students/", views.StudentListAPIView.as_view()),
     path("", include(router.urls)),
-    # path("sponsor/<int:pk>/", views.SponsorUpdateAPIView.as_view({"get": "retrieve"})),
 ]

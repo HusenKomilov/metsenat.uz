@@ -25,11 +25,13 @@ class Sponsor(BaseModel):
     sponsor_condition = models.CharField(max_length=32,
                                          choices=choices.SponsorCondition.choices)  # Yangi, Bekor qilingan
     transfers = models.CharField(max_length=32, choices=choices.SponsorPaymentType.choices)  # Pul o'tkazmalari
-    default_sum = models.CharField(max_length=32, choices=choices.SponsorSum.choices, blank=True, null=True)
     organization = models.CharField(max_length=256, unique=True, blank=True, null=True)
 
     sponsor_sum = models.IntegerField(default=0)
     separated = models.IntegerField(default=0)  # ajratilgan summa
+
+    def sponsor_separated(self):  # Qolgan summa
+        return self.sponsor_sum - self.separated
 
     def __str__(self):
         return self.full_name
@@ -44,7 +46,12 @@ class Student(BaseModel):
     university = models.ForeignKey(University, on_delete=models.CASCADE, related_name="university")
 
     contract = models.IntegerField(default=0)  # kontrakt summasi
-    separated = models.IntegerField(default=0, blank=True, null=True)  # ajratilgan summa
+    separated = models.IntegerField(default=0, editable=False, blank=True, null=True)  # ajratilgan summa
+
+    is_active = models.BooleanField(default=True)
+
+    def separated_sum(self):  # To'lanishi kerak
+        return self.contract - self.separated
 
     def __str__(self):
         return self.full_name
@@ -54,7 +61,7 @@ class StudentSponsor(BaseModel):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="student")
     sponsor = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="sponsor")
 
-    separated = models.IntegerField(default=0)  # Ajratilingan summa
+    separated = models.DecimalField(max_digits=78, decimal_places=0, null=True)  # Ajratilingan summa
 
     def __str__(self):
         return self.student.full_name

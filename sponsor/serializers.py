@@ -16,24 +16,9 @@ class SponsorListSerializer(serializers.ModelSerializer):
         )
 
 
-class SponsorUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Sponsor
-        fields = (
-            "full_name",
-            "phone_number",
-            "sponsor_condition",
-            "sponsor_sum",
-            "transfers",
-            "sponsor_type",
-            "organization"
-        )
-
-
 class SponsorCreateSerializer(serializers.Serializer):
     full_name = serializers.CharField(max_length=256)
     phone_number = serializers.CharField(max_length=32)
-    default_sum = serializers.ChoiceField(choices=choices.SponsorSum.choices)
     sponsor_sum = serializers.IntegerField(default=0)
 
     class Meta:
@@ -41,16 +26,14 @@ class SponsorCreateSerializer(serializers.Serializer):
         fields = (
             "full_name",
             "phone_number",
-            "default_sum",
             "sponsor_sum"
         )
 
     def create(self, validated_data):
         return models.Sponsor.objects.create(**validated_data)
 
-    def validate_name(self, value):
-        all_data = models.Sponsor.objects.filter(full_name=value, sponsor_condition="New")
-
+    def validate_full_name(self, value):
+        all_data = models.Sponsor.objects.filter(full_name=value, sponsor_condition="Yangi")
         if all_data:
             raise serializers.ValidationError("Sizningso'rovingiz ko'rib chiqish uchun yuborilgan")
         else:
@@ -73,6 +56,15 @@ class StudentListSerializer(serializers.ModelSerializer):
 
 
 class StudentCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Student
+        fields = ("full_name", "phone_number", "university", "student_type", "contract")
+
+
+class StudentUpdateSerializer(serializers.ModelSerializer):
+    university = UniversitySerializer()
+
     class Meta:
         model = models.Student
         fields = ("full_name", "student_type", "university", "contract")
